@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
         else if (args.run_tests == "one-solution") { 
             results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, false);
         }
-        save_results(results, "results_bitwise_" + args.run_tests + ".csv");
+        save_results(results, "results_backtracking_" + args.run_tests + ".csv");
     }
     else {
         QueensSolver qs(args.board_size, args.all_solutions, args.print_solutions);

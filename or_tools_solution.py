@@ -102,7 +102,7 @@ if __name__ == "__main__":
         elif args.run_tests == "one-solution":
             results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=False)
 
-        results.to_csv(f"results_{args.run_tests}.csv", index=None)
+        results.to_csv(f"results_or_tools_{args.run_tests}.csv", index=None)
 
     else:
         solve_n_queens(args.board_size, args.all_solutions, print_information=True)
