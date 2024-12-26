@@ -6,14 +6,13 @@ using namespace std;
 class QueensSolver {
 private:
     int n;
-    vector<vector<int>> board;
     bool all_solutions, show_solutions;
     vector<int> curr_solution;
     int solution_count;
 
     void print_solution() {
-        // I don't use endl because it flushes the output (inefficient)
-        cout << "Solution " << ++solution_count << '\n';
+        // Don't use endl because it flushes the output (inefficient)
+        cout << "Solution " << solution_count << '\n';
 
         for (int r = 0; r < n; r++) {
             int col = curr_solution[r];
@@ -38,7 +37,10 @@ private:
     void place_queen(int r, vector<bool> &filled_cols, vector<bool> filled_maj_diags, vector<bool> filled_min_diags) {
         if (r == n) {    // row outside board
             // means that every queen is placed so we just found a solution
-            print_solution();
+            solution_count++;
+            if (show_solutions) {
+                print_solution();
+            }
 
             return;     // backtrack
         }
@@ -74,6 +76,7 @@ public:
         vector<bool> filled_cols(n, false), filled_maj_diags(nr_of_diagonals, false), filled_min_diags(nr_of_diagonals, false);
 
         place_queen(0, filled_cols, filled_maj_diags, filled_min_diags);
+        cout << "Found " << solution_count << " solution(s)" << '\n';
     }
 };
 
