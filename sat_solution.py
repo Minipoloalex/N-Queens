@@ -3,6 +3,7 @@ from pysat.solvers import Glucose42
 import numpy as np
 import time
 import pandas as pd
+from utils import run_tests
 
 class QueensSolver:
     n: int
@@ -73,25 +74,30 @@ class QueensSolver:
 
         return total_time
 
-def run_tests(max_board_size: int, number_of_times: int) -> pd.DataFrame:
-    pass
-    # results = {}
-    # for board_size in range(1, max_board_size + 1):
-    #     for _ in range(number_of_times):
-    #         queens_solver = QueensSolver(board_size)
-    #         time_taken = queens_solver.solve()
-    #         results[board_size] = time_taken
-    # return results
 
+def run_timing_tests(max_board_size: int, nr_tests_per_board_size: int, find_all_solutions: bool) -> pd.DataFrame:
+    def solve(board_size: int) -> float:
+        return QueensSolver(board_size).solve()
+    return run_tests(solve, max_board_size, nr_tests_per_board_size)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Solve the N Queens problem.")
-    parser.add_argument("-n", "--board_size", type=int, default=8, help="Size of the chessboard (default: 8)")
-    parser.add_argument("-r", "--run_tests", action="store_true", help="Run all tests (default: False). If set ignores other parameters")
+    parser.add_argument("--board_size", type=int, default=8, help="Size of the chessboard (default: 8)")
+    # parser.add_argument("--all_solutions", action="store_true", help="Show all solutions (default: False)")
+    parser.add_argument("--run_tests", choices=["false", "all-solutions", "one-solution"], default="false", help="Run all tests (default: False)")
 
+    MAX_BOARD_SIZE = 15
+    NR_TESTS_PER_BOARD_SIZE = 5
     args = parser.parse_args()
-    if args.run_tests:
-        results = run_tests(max_board_size = 15, number_of_times = 5)
+
+    if args.run_tests != "false":
+        if args.run_tests == "all-solutions":
+            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=True)
+        elif args.run_tests == "one-solution":
+            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=False)
+
+        results.to_csv(f"results_sat_{args.run_tests}.csv", index=None)
+
     else:
         queens_solver = QueensSolver(args.board_size)
         queens_solver.solve()

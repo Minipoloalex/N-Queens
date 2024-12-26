@@ -5,9 +5,11 @@ import argparse
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+from utils import run_tests
+
 
 class NQueenSolutionPrinter(cp_model.CpSolverSolutionCallback):
-    """Print intermediate solutions."""
+    """Print possible solutions for the N-Queens problem"""
 
     def __init__(self, queens: list[cp_model.IntVar]):
         cp_model.CpSolverSolutionCallback.__init__(self)
@@ -21,11 +23,11 @@ class NQueenSolutionPrinter(cp_model.CpSolverSolutionCallback):
 
     def on_solution_callback(self):
         current_time = time.time()
+        self.__solution_count += 1
         print(
             f"Solution {self.__solution_count}, "
             f"time = {current_time - self.__start_time} s"
         )
-        self.__solution_count += 1
 
         all_queens = range(len(self.__queens))
         for i in all_queens:
@@ -38,8 +40,7 @@ class NQueenSolutionPrinter(cp_model.CpSolverSolutionCallback):
             print()
         print()
 
-def solve_n_queens(board_size: int, all_solutions: bool, print_information: bool = True) -> None:
-    print(board_size, all_solutions)
+def solve_n_queens(board_size: int, all_solutions: bool, print_information: bool = True) -> float:
     # Creates the solver
     model = cp_model.CpModel()
 
@@ -66,7 +67,7 @@ def solve_n_queens(board_size: int, all_solutions: bool, print_information: bool
     solver.solve(model, solution_printer)
     total_time = time.time() - start
 
-    # Statistics.
+    # Statistics
     if print_information:
         print("\nStatistics")
         print(f"  conflicts      : {solver.num_conflicts}")
@@ -77,49 +78,31 @@ def solve_n_queens(board_size: int, all_solutions: bool, print_information: bool
 
     return total_time
 
-def run_tests(max_board_size: int = 10, nr_tests_per_board_size: int = 5) -> list[list[float]]:
-    # solver: callable[[int], float], 
-    results = {}
-    for board_size in range(1, max_board_size + 1):
-        board_size_results = []
-        for _ in range(nr_tests_per_board_size):
-            # time_result = solver(board_size)
-            time_result = solve_n_queens(board_size, all_solutions=True, print_information=False)
-            board_size_results.append(time_result)
-        results[f"size_{board_size}"] = board_size_results
-    return pd.DataFrame(results)
 
-def plot_times(times_taken: pd.DataFrame):
-    sns.lineplot(times_taken)
-    plt.show()
+def run_timing_tests(max_board_size: int, nr_tests_per_board_size: int, find_all_solutions: bool) -> pd.DataFrame:
+    def solve(board_size: int) -> float:
+        return solve_n_queens(board_size, all_solutions=find_all_solutions, print_information=False)
+
+    return run_tests(solve, max_board_size, nr_tests_per_board_size)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Solve the N Queens problem.")
-    parser.add_argument("-n", "--board_size", type=int, default=8, help="Size of the chessboard (default: 8)")
-    parser.add_argument("-a", "--all_solutions", action="store_true", help="Show all solutions (default: False)")
-    parser.add_argument("-r", "--run_tests", action="store_true", help="Run all tests (default: False)")
+    parser.add_argument("--board_size", type=int, default=8, help="Size of the chessboard (default: 8)")
+    parser.add_argument("--all_solutions", action="store_true", help="Show all solutions (default: False)")
+    parser.add_argument("--run_tests", choices=["false", "all-solutions", "one-solution"], default="false", help="Run all tests (default: False)")
 
+    MAX_BOARD_SIZE = 15
+    NR_TESTS_PER_BOARD_SIZE = 5
     args = parser.parse_args()
-    if args.run_tests:
-        results = run_tests(15, 5)
-        results.to_csv("results.csv", index=None)
-        plot_times(results)
-        treated_results = results.agg(["mean", "std"], axis=0)
-        print(treated_results)
 
-        # Transpose the DataFrame
-        df_transposed = treated_results.transpose()
+    if args.run_tests != "false":
+        if args.run_tests == "all-solutions":
+            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=True)
+        elif args.run_tests == "one-solution":
+            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=False)
 
-        # Reset index for Seaborn compatibility
-        df_transposed.reset_index(inplace=True)
-        df_transposed.columns = ['Size', 'Mean', 'Std']  # Rename columns for better plot readability
+        results.to_csv(f"results_{args.run_tests}.csv", index=None)
 
-        # Melt the DataFrame to long format for Seaborn
-        df_melted = df_transposed.melt(id_vars='Size', var_name='Metric', value_name='Value')
-
-        # Plot using Seaborn
-        sns.lineplot(data=df_melted, x='Size', y='Value', hue='Metric')
-        plt.title('Mean and Std for Sizes')
-        plt.show()
     else:
-        solve_n_queens(args.board_size, args.all_solutions)
+        solve_n_queens(args.board_size, args.all_solutions, print_information=True)
