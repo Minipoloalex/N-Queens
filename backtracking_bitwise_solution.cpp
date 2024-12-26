@@ -1,4 +1,6 @@
 #include <bits/stdc++.h>
+#include "utils.cpp"
+
 using namespace std;
 
 #define LSB(i) ((i) & -(i))
@@ -60,61 +62,38 @@ public:
         solution_count = 0;
     }
 
-    void solve() {
+    double solve() {
         place_queen(0, 0, 0);
         cout << "Found " << solution_count << " solution(s)" << '\n';
+        return 0;   // TODO: time spent
     }
 };
 
-void run_timing_tests(int max_board_size, int number_of_times) {
-    for (int board_size = 1; board_size <= max_board_size; board_size++) {
-        for (int i = 0; i < number_of_times; i++) {
-            QueensSolver qs(board_size, false, false);
-            qs.solve();
-        }
-    }
+vector<vector<double>> run_timing_tests(int max_board_size, int number_of_times, bool find_all_solutions) {
+    function<double(int)> solve = [&] (int board_size) -> double {
+        return QueensSolver(board_size, find_all_solutions, false).solve();
+    };
+    return run_timing_tests_helper(solve, max_board_size, number_of_times);
 }
 
 int main(int argc, char *argv[]) {
-    // Default parameters
-    int board_size = 8;
-    bool print_solutions = false;
-    bool run_tests = false;
+    CommandLineArgs args = parse_arguments(argc, argv);
 
-    // Parse command-line arguments
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
-        if (arg == "--board" || arg == "-b") {
-            if (i + 1 < argc) {
-                board_size = std::stoi(argv[++i]); // Convert the next argument to an integer
-            } else {
-                std::cerr << "Error: --board option requires a value.\n";
-                return 1;
-            }
-        } else if (arg == "--print" || arg == "-p") {
-            print_solutions = true;
-        } else if (arg == "--run_tests" || arg == "-t") {
-            run_tests = true;
-        } else if (arg == "--help" || arg == "-h") {
-            std::cout << "Usage: " << argv[0] << " [options]\n"
-                      << "Options:\n"
-                      << "  -b, --board SIZE    Set the board size (default: 8)\n"
-                      << "  -p, --print         Print solutions\n"
-                      << "  -t, --tests         Run tests\n"
-                      << "  -h, --help          Show this help message\n";
-            return 0;
-        } else {
-            std::cerr << "Unknown option: " << arg << "\n";
-            return 1;
+
+    if (args.run_tests != "false") {
+        int MAX_BOARD_SIZE = 15, NR_TESTS_PER_BOARD_SIZE = 5;
+
+        vector<vector<double>> results;
+        if (args.run_tests == "all-solutions") {
+            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, true);
         }
-    }
-
-    if (run_tests) {
-        int max_board_size = 15, number_of_times = 5;
-        run_timing_tests(max_board_size, number_of_times);
+        else if (args.run_tests == "one-solution") { 
+            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, false);
+        }
+        save_results(results, "results_bitwise_" + args.run_tests + ".csv");
     }
     else {
-        QueensSolver qs(board_size, false, print_solutions);
+        QueensSolver qs(args.board_size, false, args.print_solutions);
         qs.solve();
     }
     return 0;

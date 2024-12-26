@@ -54,7 +54,7 @@ void save_results(const vector<vector<double>> &results, const string &filename)
 
 struct CommandLineArgs {
     int board_size = 8;
-    bool all_solutions = false;
+    bool all_solutions = true;
     string run_tests = "false";
     bool print_solutions = false;
 };
