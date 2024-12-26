@@ -76,12 +76,20 @@ public:
     }
 
     double solve() {
+        auto start = chrono::high_resolution_clock::now();
+
         int nr_of_diagonals = n * 2 - 1;    // total number of diagonals to one side
         vector<bool> filled_cols(n, false), filled_maj_diags(nr_of_diagonals, false), filled_min_diags(nr_of_diagonals, false);
 
         place_queen(0, filled_cols, filled_maj_diags, filled_min_diags);
-        cout << "Found " << solution_count << " solution(s)" << '\n';
-        return 0;   // TODO: time spent
+
+        auto end = chrono::high_resolution_clock::now();
+
+        cout << "Found " << solution_count << " solution(s) for a board size of " << n << '\n';
+
+        int64_t nanoseconds = (end - start).count();
+        double seconds = double(nanoseconds) / 1e9;
+        return seconds;
     }
 };
 

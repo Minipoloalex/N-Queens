@@ -63,9 +63,15 @@ public:
     }
 
     double solve() {
+        auto start = chrono::high_resolution_clock::now();
         place_queen(0, 0, 0);
-        cout << "Found " << solution_count << " solution(s)" << '\n';
-        return 0;   // TODO: time spent
+        auto end = chrono::high_resolution_clock::now();
+
+        cout << "Found " << solution_count << " solution(s) for a board size of " << n << '\n';
+        
+        int64_t nanoseconds = (end - start).count();
+        double seconds = double(nanoseconds) / 1e9;
+        return seconds;
     }
 };
 
