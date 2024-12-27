@@ -20,6 +20,9 @@ These are the solutions that we manually implemented. These require a special at
 
 Additionally, in order to understand these solutions, the reader should have at least a basic understanding of Data Structures and Algorithms (DSA), specifically of backtracking algorithms.
 
+These solutions were tested in an online judge that presents several classic programming problems, like this one. The problem presented there is slightly different and it required some small adjustments to save the obtained solutions: https://leetcode.com/problems/n-queens/description/. Both of the solutions presented here were able to pass the test cases from this online judge.
+
+
 For these solutions, it is suggested that the commands to run the program are copied and only the parameters should be adjusted (e.g., specify a different board size).
 
 There are 2 files to run corresponding to two different solutions, as we'll see below.
