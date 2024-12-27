@@ -44,12 +44,12 @@ private:
             return;
         }
 
-        // An int has 32 bits, so many will be set to 1 (after the bitwise NOT)
+        // An int has 32 bits, so many will be set to 1 (because of the bitwise NOT)
         // The mask ensures that bits outside the range are avoided, using only the n bits that represent valid columns
         int possible_bits = ~(col_bits | maj_diag_bits | min_diag_bits) & mask;
-        for (int bit; possible_bits > 0; ) {
-            bit = LSB(possible_bits);
-            possible_bits ^= bit;   // trying this bit (should remove it from possible bits)
+        while (possible_bits > 0) {
+            int bit = LSB(possible_bits);
+            possible_bits ^= bit;   // trying this bit: remove it from possible bits
             curr_solution.push_back(bit);
             place_queen(col_bits | bit, (maj_diag_bits | bit) << 1, (min_diag_bits | bit) >> 1);
             curr_solution.pop_back();

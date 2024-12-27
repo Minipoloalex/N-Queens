@@ -15,13 +15,17 @@ class QueensSolver:
 
     def __init_variables(self) -> None:
         # Q[i][j] will denote there is a queen on square (i, j)
-        self.board = [[0 for _ in range(self.n)] for _ in range(self.n)]
 
-        var_id = 1
-        for r in range(self.n):
-            for c in range(self.n):
-                self.board[r][c] = var_id
-                var_id += 1
+        # Setup the variable ids
+        self.board = [[r * self.n + c + 1 for c in range(self.n)] for r in range(self.n)]
+
+        # For example, for n = 4:
+        # board = [
+        #     [1, 2, 3, 4],
+        #     [5, 6, 7, 8],
+        #     [9, 10, 11, 12],
+        #     [13, 14, 15, 16]
+        # ]
 
     def squares_in_row(self, r: int) -> set:
         return {self.board[r][c] for c in range(self.n)}
@@ -57,12 +61,16 @@ class QueensSolver:
     def solve(self):
         solver = Glucose42()
         for i in range(self.n):
-            solver.add_clause(self.squares_in_row(i))
-            solver.add_clause(self.squares_in_col(i))
+            solver.add_clause(self.squares_in_row(i))   # a row must have a queen
+            solver.add_clause(self.squares_in_col(i))   # a column must have a queen
+
         for r in range(self.n):
             for c in range(self.n):
                 for variable in self.squares_attacked(r, c):
-                    solver.add_clause([-self.board[r][c], -variable])   # self.board[r][c] -> -variable
+                    # A queen at (r, c) makes it so all 
+                    # attacked variables must be false
+                    # self.board[r][c] -> -variable
+                    solver.add_clause([-self.board[r][c], -variable])
         start = time.time()
         has_solution = solver.solve()
         total_time = time.time() - start

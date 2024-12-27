@@ -34,7 +34,7 @@ private:
         return r + c;   // the same min diagonals have the same coordinate sum
     }
 
-    void place_queen(int r, vector<bool> &filled_cols, vector<bool> filled_maj_diags, vector<bool> filled_min_diags) {
+    void place_queen(int r, vector<bool> &filled_cols, vector<bool> &filled_maj_diags, vector<bool> &filled_min_diags) {
         // if we've found a solution but don't want to get all of them
         // just finish
         if (solution_count > 0 && !all_solutions) return;
