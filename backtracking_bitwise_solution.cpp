@@ -32,7 +32,10 @@ private:
     }
 
     void place_queen(int col_bits, int maj_diag_bits, int min_diag_bits) {
-        // cout << curr_solution.size() << " "  << col_bits << endl;
+        // if we've found a solution but don't want to get all of them
+        // just finish
+        if (solution_count > 0 && !all_solutions) return;
+
         // base case (finished)
         if (col_bits == mask) { // could also check: curr_solution.size() == n
             // all columns are filled -> found a solution
@@ -87,14 +90,14 @@ int main(int argc, char *argv[]) {
 
 
     if (args.run_tests != "false") {
-        int MAX_BOARD_SIZE = 15, NR_TESTS_PER_BOARD_SIZE = 5;
+        int NR_TESTS_PER_BOARD_SIZE = 5;
 
         vector<vector<double>> results;
         if (args.run_tests == "all_solutions") {
-            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, true);
+            results = run_timing_tests(args.board_size, NR_TESTS_PER_BOARD_SIZE, true);
         }
         else if (args.run_tests == "one_solution") { 
-            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, false);
+            results = run_timing_tests(args.board_size, NR_TESTS_PER_BOARD_SIZE, false);
         }
         save_results(results, "results_bitwise_" + args.run_tests + ".csv");
     }

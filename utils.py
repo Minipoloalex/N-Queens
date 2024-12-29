@@ -7,6 +7,7 @@ def run_tests(
     max_board_size: int = 10,
     nr_tests_per_board_size: int = 5,
 ) -> pd.DataFrame:
+    print(f"Measuring times for up to a board size of {max_board_size}");
     results = {}
     for board_size in range(1, max_board_size + 1):
         board_size_results = []

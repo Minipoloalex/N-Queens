@@ -2,6 +2,7 @@
 using namespace std;
 
 vector<vector<double>> run_timing_tests_helper(function<double(int)> solve, int max_board_size, int number_of_times) {
+    cout << "Measuring times for up to a board size of " << max_board_size << '\n';
     vector<vector<double>> ans;
     for (int board_size = 1; board_size <= max_board_size; board_size++) {
         vector<double> board_size_times;

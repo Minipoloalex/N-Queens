@@ -102,15 +102,14 @@ if __name__ == "__main__":
     parser.add_argument("--print_solutions", action="store_true", help="Show solutions found (default: False)")
     parser.add_argument("--run_tests", choices=["false", "all_solutions", "one_solution"], default="false", help="Run all tests (default: False)")
 
-    MAX_BOARD_SIZE = 15
     NR_TESTS_PER_BOARD_SIZE = 5
     args = parser.parse_args()
 
     if args.run_tests != "false":
         if args.run_tests == "all_solutions":
-            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=True)
+            results = run_timing_tests(args.board_size, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=True)
         elif args.run_tests == "one_solution":
-            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=False)
+            results = run_timing_tests(args.board_size, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=False)
 
         results.to_csv(f"results_or_tools_{args.run_tests}.csv", index=None)
 

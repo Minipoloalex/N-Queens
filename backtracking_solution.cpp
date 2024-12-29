@@ -104,14 +104,14 @@ int main(int argc, char *argv[]) {
     CommandLineArgs args = parse_arguments(argc, argv);
 
     if (args.run_tests != "false") {
-        int MAX_BOARD_SIZE = 15, NR_TESTS_PER_BOARD_SIZE = 5;
+        int NR_TESTS_PER_BOARD_SIZE = 5;
 
         vector<vector<double>> results;
         if (args.run_tests == "all_solutions") {
-            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, true);
+            results = run_timing_tests(args.board_size, NR_TESTS_PER_BOARD_SIZE, true);
         }
         else if (args.run_tests == "one_solution") { 
-            results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, false);
+            results = run_timing_tests(args.board_size, NR_TESTS_PER_BOARD_SIZE, false);
         }
         save_results(results, "results_backtracking_" + args.run_tests + ".csv");
     }
