@@ -107,10 +107,10 @@ int main(int argc, char *argv[]) {
         int MAX_BOARD_SIZE = 15, NR_TESTS_PER_BOARD_SIZE = 5;
 
         vector<vector<double>> results;
-        if (args.run_tests == "all-solutions") {
+        if (args.run_tests == "all_solutions") {
             results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, true);
         }
-        else if (args.run_tests == "one-solution") { 
+        else if (args.run_tests == "one_solution") { 
             results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, false);
         }
         save_results(results, "results_backtracking_" + args.run_tests + ".csv");

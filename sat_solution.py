@@ -9,8 +9,11 @@ class QueensSolver:
     n: int
     board: list[list[int]]
 
-    def __init__(self, n: int) -> None:
+    def __init__(self, n: int, find_all_solutions: bool, print_solutions: bool) -> None:
         self.n = n
+        self.find_all_solutions = find_all_solutions
+        self.print_solutions = print_solutions
+        self.solution_count = 0
         self.__init_variables()
 
     def __init_variables(self) -> None:
@@ -53,10 +56,17 @@ class QueensSolver:
         ans.remove(self.board[r][c])
         return ans
 
+    def handle_solution(self, model: list[int]) -> None:
+        self.solution_count += 1
+        if self.print_solutions:
+            self.print_solution(model)
+
     def print_solution(self, model: list[int]) -> None:
         model_2d = np.reshape(model, (self.n, self.n))
+        print(f"Solution {self.solution_count}")
         for row in model_2d:
             print(''.join('Q' if val > 0 else '.' for val in row))
+        print()
 
     def solve(self):
         solver = Glucose42()
@@ -71,15 +81,22 @@ class QueensSolver:
                     # attacked variables must be false
                     # self.board[r][c] -> -variable
                     solver.add_clause([-self.board[r][c], -variable])
-        start = time.time()
-        has_solution = solver.solve()
-        total_time = time.time() - start
 
-        if has_solution:
-            model = solver.get_model()
-            print(model)
-            self.print_solution(model)
+        if self.find_all_solutions: # Find all valid solutions
+            start = time.time()
+            for model in solver.enum_models():
+                self.handle_solution(model)
+            total_time = time.time() - start
+        else:
+            start = time.time()
+            has_solution = solver.solve()   # Find just one solution
+            if has_solution:
+                model = solver.get_model()
+                self.handle_solution(model)
 
+            total_time = time.time() - start
+
+        print(f"Found {self.solution_count} solution(s) for a board size of {self.n}")
         return total_time
 
 
@@ -91,21 +108,22 @@ def run_timing_tests(max_board_size: int, nr_tests_per_board_size: int, find_all
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Solve the N Queens problem.")
     parser.add_argument("--board_size", type=int, default=8, help="Size of the chessboard (default: 8)")
-    # parser.add_argument("--all_solutions", action="store_true", help="Show all solutions (default: False)")
-    parser.add_argument("--run_tests", choices=["false", "all-solutions", "one-solution"], default="false", help="Run all tests (default: False)")
+    parser.add_argument("--all_solutions", action="store_true", help="Find all solutions (default: False)")
+    parser.add_argument("--print_solutions", action="store_true", help="Show solutions found (default: False)")
+    parser.add_argument("--run_tests", choices=["false", "all_solutions", "one_solution"], default="false", help="Run all tests (default: False)")
 
     MAX_BOARD_SIZE = 15
     NR_TESTS_PER_BOARD_SIZE = 5
     args = parser.parse_args()
 
     if args.run_tests != "false":
-        if args.run_tests == "all-solutions":
+        if args.run_tests == "all_solutions":
             results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=True)
-        elif args.run_tests == "one-solution":
+        elif args.run_tests == "one_solution":
             results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=False)
 
         results.to_csv(f"results_sat_{args.run_tests}.csv", index=None)
 
     else:
-        queens_solver = QueensSolver(args.board_size)
+        queens_solver = QueensSolver(args.board_size, args.all_solutions, args.print_solutions)
         queens_solver.solve()

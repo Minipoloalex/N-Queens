@@ -76,13 +76,13 @@ CommandLineArgs parse_arguments(int argc, char* argv[]) {
         } else if (arg == "--run_tests") {
             if (i + 1 < argc) {
                 string value = argv[++i];
-                if (value == "false" || value == "all-solutions" || value == "one-solution") {
+                if (value == "false" || value == "all_solutions" || value == "one_solution") {
                     args.run_tests = value;
                 } else {
-                    throw invalid_argument("Invalid value for --run_tests. Allowed values are: false, all-solutions, one-solution");
+                    throw invalid_argument("Invalid value for --run_tests. Allowed values are: false, all_solutions, one_solution");
                 }
             } else {
-                throw invalid_argument("Missing value for --run_tests");
+                throw invalid_argument("Missing value for --run_tests. Allowed values are: false, all_solutions, one_solution");
             }
         } else if (arg == "--print_solutions") {
             args.print_solutions = true;

@@ -8,12 +8,14 @@ import pandas as pd
 from utils import run_tests
 
 
-class NQueenSolutionPrinter(cp_model.CpSolverSolutionCallback):
+class NQueenSolutionHandler(cp_model.CpSolverSolutionCallback):
     """Print possible solutions for the N-Queens problem"""
 
-    def __init__(self, queens: list[cp_model.IntVar]):
+    def __init__(self, queens: list[cp_model.IntVar], find_all_solutions: bool, print_information: bool):
         cp_model.CpSolverSolutionCallback.__init__(self)
         self.__queens = queens
+        self.find_all_solutions = find_all_solutions
+        self.print_information = print_information
         self.__solution_count = 0
         self.__start_time = time.time()
 
@@ -22,25 +24,30 @@ class NQueenSolutionPrinter(cp_model.CpSolverSolutionCallback):
         return self.__solution_count
 
     def on_solution_callback(self):
-        current_time = time.time()
         self.__solution_count += 1
-        print(
-            f"Solution {self.__solution_count}, "
-            f"time = {current_time - self.__start_time} s"
-        )
+        if self.print_information:  # Print solution and information
+            current_time = time.time()
+            print(
+                f"Solution {self.__solution_count}, "
+                f"time = {current_time - self.__start_time} s"
+            )
 
-        all_queens = range(len(self.__queens))
-        for i in all_queens:
-            for j in all_queens:
-                if self.value(self.__queens[j]) == i:
-                    # There is a queen in column j, row i.
-                    print("Q", end=" ")
-                else:
-                    print("_", end=" ")
+            all_queens = range(len(self.__queens))
+            for i in all_queens:
+                for j in all_queens:
+                    if self.value(self.__queens[j]) == i:
+                        # There is a queen in column j, row i.
+                        print("Q", end=" ")
+                    else:
+                        print("_", end=" ")
+                print()
             print()
-        print()
 
-def solve_n_queens(board_size: int, all_solutions: bool, print_information: bool = True) -> float:
+        if not self.find_all_solutions:
+            # Make sure it stops trying to find solutions after finding one
+            self.stop_search()
+
+def solve_n_queens(board_size: int, all_solutions: bool, print_solutions: bool, print_information: bool = True) -> float:
     # Creates the solver
     model = cp_model.CpModel()
 
@@ -59,12 +66,13 @@ def solve_n_queens(board_size: int, all_solutions: bool, print_information: bool
 
     # Solve the model
     solver = cp_model.CpSolver()
+    # By itself, this does not enforce that the solver will stop after finding one solution
     solver.parameters.enumerate_all_solutions = all_solutions
 
-    solution_printer = NQueenSolutionPrinter(queens) if print_information else None
+    solution_handler = NQueenSolutionHandler(queens, all_solutions, print_solutions)
 
     start = time.time()
-    solver.solve(model, solution_printer)
+    solver.solve(model, solution_handler)
     total_time = time.time() - start
 
     # Statistics
@@ -73,15 +81,16 @@ def solve_n_queens(board_size: int, all_solutions: bool, print_information: bool
         print(f"  conflicts      : {solver.num_conflicts}")
         print(f"  branches       : {solver.num_branches}")
         print(f"  wall time      : {solver.wall_time} s")
-        print(f"  solutions found: {solution_printer.solution_count}")
+        print(f"  solutions found: {solution_handler.solution_count}")
         print(f"  total time     : {total_time}")
-
+    else:
+        print(f"Solutions found: {solution_handler.solution_count}")
     return total_time
 
 
 def run_timing_tests(max_board_size: int, nr_tests_per_board_size: int, find_all_solutions: bool) -> pd.DataFrame:
     def solve(board_size: int) -> float:
-        return solve_n_queens(board_size, all_solutions=find_all_solutions, print_information=False)
+        return solve_n_queens(board_size, all_solutions=find_all_solutions, print_solutions=False, print_information=False)
 
     return run_tests(solve, max_board_size, nr_tests_per_board_size)
 
@@ -89,20 +98,21 @@ def run_timing_tests(max_board_size: int, nr_tests_per_board_size: int, find_all
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Solve the N Queens problem.")
     parser.add_argument("--board_size", type=int, default=8, help="Size of the chessboard (default: 8)")
-    parser.add_argument("--all_solutions", action="store_true", help="Show all solutions (default: False)")
-    parser.add_argument("--run_tests", choices=["false", "all-solutions", "one-solution"], default="false", help="Run all tests (default: False)")
+    parser.add_argument("--all_solutions", action="store_true", help="Find all solutions (default: False)")
+    parser.add_argument("--print_solutions", action="store_true", help="Show solutions found (default: False)")
+    parser.add_argument("--run_tests", choices=["false", "all_solutions", "one_solution"], default="false", help="Run all tests (default: False)")
 
     MAX_BOARD_SIZE = 15
     NR_TESTS_PER_BOARD_SIZE = 5
     args = parser.parse_args()
 
     if args.run_tests != "false":
-        if args.run_tests == "all-solutions":
+        if args.run_tests == "all_solutions":
             results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=True)
-        elif args.run_tests == "one-solution":
+        elif args.run_tests == "one_solution":
             results = run_timing_tests(MAX_BOARD_SIZE, NR_TESTS_PER_BOARD_SIZE, find_all_solutions=False)
 
         results.to_csv(f"results_or_tools_{args.run_tests}.csv", index=None)
 
     else:
-        solve_n_queens(args.board_size, args.all_solutions, print_information=True)
+        solve_n_queens(args.board_size, args.all_solutions, args.print_solutions, print_information=True)
