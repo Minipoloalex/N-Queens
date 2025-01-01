@@ -109,7 +109,7 @@ g++ backtracking_bitwise_solution.cpp && ./a.out --board_size 8 --print_solution
 This solution is adapted from https://bpochily.github.io/bitwise-optimization-of-n-queens/ and https://www.cl.cam.ac.uk/~mr10/backtrk.pdf.
 
 #### Measure times
-Since this solutions uses bits and 32-bit integers, it does not work for bigger sizes of the board. Actually, it only works up until size 30 (inclusive), because of the way negative values are used in the bitwise operations. Running this solution for bigger sizes than 30 will lead to invalid times, since the solutions are also invalid. Since the time taken to run the solution grows exponentially, and we can already detect at size 30 this trend, we just decided to leave it with 32 bits, instead of changing it to 64 bits. 
+Since this solutions uses bits and 32-bit integers, it does not work for bigger sizes of the board. Actually, it only works up until size 30 (inclusive), because of the way negative values are used in the bitwise operations. Running this solution for bigger sizes than 30 will lead to invalid times, since the solutions are also invalid. Since the time taken to run the solution grows exponentially, and we can already detect at size 30 this exponential trend, we just decided to leave it implemented with 32 bits, instead of changing it to allow bigger sizes with 64 bits.
 
 To run the timing tests for all solutions:
 ```bash

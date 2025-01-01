@@ -28,10 +28,13 @@ private:
     // that a specific diagonal is always mapped to the same index
     // and that this index fits within the vector size given
     int get_maj_diag(int r, int c) {
-        return c - r + (n - 1);     // + (n - 1) ensures that the diagonal has a valid index (>= 0)
+        // the same major diagonals have the same coordinate (c - r)
+        // + (n - 1) ensures that the diagonal has a valid index (>= 0)
+        return c - r + (n - 1);
     }
     int get_min_diag(int r, int c) {
-        return r + c;   // the same min diagonals have the same coordinate sum
+        // the same minor diagonals have the same coordinate sum
+        return r + c;
     }
 
     void place_queen(int r, vector<bool> &filled_cols, vector<bool> &filled_maj_diags, vector<bool> &filled_min_diags) {

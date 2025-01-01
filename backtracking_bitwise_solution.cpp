@@ -54,7 +54,7 @@ private:
             int bit = LSB(possible_bits);
             possible_bits ^= bit;   // trying this bit: remove it from possible bits
             curr_solution.push_back(bit);
-            place_queen(col_bits | bit, (maj_diag_bits | bit) << 1, (min_diag_bits | bit) >> 1);
+            place_queen(col_bits | bit, (maj_diag_bits | bit) >> 1, (min_diag_bits | bit) << 1);
             curr_solution.pop_back();
         }
     }
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
         save_results(results, "results_bitwise_" + args.run_tests + ".csv");
     }
     else {
-        QueensSolver qs(args.board_size, false, args.print_solutions);
+        QueensSolver qs(args.board_size, args.all_solutions, args.print_solutions);
         qs.solve();
     }
     return 0;
