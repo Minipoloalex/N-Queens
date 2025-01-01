@@ -17,7 +17,7 @@ class QueensSolver:
         self.__init_variables()
 
     def __init_variables(self) -> None:
-        # Q[i][j] will denote there is a queen on square (i, j)
+        # board[i][j] will denote there is a queen on square (i, j)
 
         # Setup the variable ids
         self.board = [[r * self.n + c + 1 for c in range(self.n)] for r in range(self.n)]
