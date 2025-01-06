@@ -1,9 +1,6 @@
-import sys
 import time
 from ortools.sat.python import cp_model
 import argparse
-import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
 from utils import run_tests
 

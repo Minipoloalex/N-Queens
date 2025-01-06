@@ -1,4 +1,8 @@
-#include <bits/stdc++.h>
+#include <vector>
+#include <functional>
+#include <fstream>
+#include <iomanip>
+
 using namespace std;
 
 vector<vector<double>> run_timing_tests_helper(function<double(int)> solve, int max_board_size, int number_of_times) {

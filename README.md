@@ -11,21 +11,31 @@ The maximum board size to test is specified as a command line argument. In each 
 ## Finding all solutions
 For every implemented solution, it is possible to modify the command line parameters for the program, specifying whether to find all or just one solution.
 
+## Python Requirements
+These are the main requirements for the Python solutions. The Python version used was 3.12.3.
+```bash
+pip install matplotlib==3.10.0 numpy==2.2.1 ortools==9.11.4210 pandas==2.2.3 python-sat==1.8.dev13 seaborn==0.13.2
+```
+
+In case something fails, check [requirements.txt](requirements.txt) for the complete list of requirements. It has the output of running `pip freeze > requirements.txt`. These can all be installed through `pip install -r requirements.txt`.
+
 
 ## OR-Tools Solution
 The implementation was based on https://developers.google.com/optimization/cp/queens.
 
 This solution uses the OR-Tools library, which uses a Sat solver internally to find a valid solution.
 
+To find all solutions, run:
+```bash
+python or_tools_solution.py --board_size 8 --print_solutions --all_solutions
+```
+
 To find just one solution, run:
 ```bash
 python or_tools_solution.py --board_size 8 --print_solutions
 ```
 
-To find all solutions, run:
-```bash
-python or_tools_solution.py --board_size 8 --print_solutions --all_solutions
-```
+
 
 #### Measure Times
 To measure the times taken to find all solutions, just do:
